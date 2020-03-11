@@ -110,7 +110,6 @@ def matrix_rank(M, tol=None):
   return np.sum(S > tol)
 
 
-
 @custom_jvp
 @_wraps(onp.linalg.slogdet)
 @jit
