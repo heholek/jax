@@ -286,7 +286,7 @@ class APITest(jtu.JaxTestCase):
     ad.defjvp(foo_p, lambda g, x: foo(g))
 
     jtu.check_raises(lambda: grad(foo)(1.0), NotImplementedError,
-                     "Reverse-mode differentiation rule for 'foo' not implemented")
+                     "Transpose rule (for reverse-mode differentiation) for 'foo' not implemented")
 
   def test_device_put_and_get(self):
     x = onp.arange(12.).reshape((3, 4)).astype("float32")

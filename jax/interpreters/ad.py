@@ -270,8 +270,8 @@ def get_primitive_transpose(p):
     return primitive_transposes[p]
   except KeyError as err:
     raise NotImplementedError(
-      "Reverse-mode differentiation rule for '{}' not implemented".format(p)
-      ) from err
+        "Transpose rule (for reverse-mode differentiation) for '{}' "
+        "not implemented".format(p)) from err
 
 class JVPTrace(Trace):
 

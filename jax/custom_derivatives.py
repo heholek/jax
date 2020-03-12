@@ -207,11 +207,20 @@ def _custom_jvp_call_jaxpr_vmap(args, in_dims, jaxpr, jvp, num_consts):
       *args, jaxpr=batched_jaxpr, jvp=batched_jvp, num_consts=num_consts)
   return batched_outs, out_dims
 
+# If a (multi)linear function is defined with a custom jvp, then
+# custom_jvp_call_jaxpr can appear in jaxprs to be transposed. We transpose it
+# like a core.call.
+def _custom_jvp_call_jaxpr_transpose(cts, *args, jaxpr, **kwargs):
+  name = 'custom_jvp_call_jaxpr_linear'
+  return ad.call_transpose(core.call_p, dict(name=name), jaxpr.jaxpr,
+                           tuple(jaxpr.literals) + args, cts)
+
 custom_jvp_call_jaxpr_p = core.Primitive('custom_jvp_call_jaxpr')
 custom_jvp_call_jaxpr_p.multiple_results = True
 custom_jvp_call_jaxpr_p.def_impl(_custom_call_jaxpr_impl)
 custom_jvp_call_jaxpr_p.def_abstract_eval(_custom_call_jaxpr_abstract_eval)
 ad.primitive_jvps[custom_jvp_call_jaxpr_p] = _custom_jvp_call_jaxpr_jvp
+ad.primitive_transposes[custom_jvp_call_jaxpr_p] = _custom_jvp_call_jaxpr_transpose
 batching.primitive_batchers[custom_jvp_call_jaxpr_p] = _custom_jvp_call_jaxpr_vmap
 xla.initial_style_translations[custom_jvp_call_jaxpr_p] = \
     xla.lower_fun(_custom_call_jaxpr_impl, initial_style=True)
